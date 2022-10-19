@@ -2,8 +2,6 @@
 В данной задаче будут рассматриваться 13-ти значные числа в тринадцатиричной системе исчисления(цифры 0,1,2,3,4,5,6,7,8,9,A,B,C) с ведущими нулями.
 Например: ABA98859978C0, 6789110551234, 0000007000000
 
-A BA9 885 997 8C0
-
 Назовем число красивым, если сумма его первых шести цифр равна сумме шести последних цифр.
 
 Пример:
@@ -19,6 +17,7 @@ A BA9 885 997 8C0
 */
 
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 const string alphabet = "0123456789ABC";
@@ -26,17 +25,15 @@ const string alphabet = "0123456789ABC";
 var sys = 13; 
 var nn = 6;
 
-// try 11, 5
-
 var n = Enumerable.Range(0, nn).Aggregate(1, (b, _) => sys * b);
 
-string GetValue13(int k)
+string GetValue13(long k)
 {
-    IEnumerable<char> Iterate(int k)
+    IEnumerable<char> Iterate(long k)
     {
         do
         {
-            yield return alphabet[k % sys];
+            yield return alphabet[(int)(k % sys)];
 
             k /= sys;
         } while (k > 0);
@@ -45,8 +42,20 @@ string GetValue13(int k)
     return new string(Iterate(k).Reverse().ToArray());
 }
 
-string GetPadNValue13(int k, int padCount) => GetValue13(k).PadLeft(padCount, '0');
-string GetPadValue13(int k) => GetValue13(k).PadLeft(nn, '0');
+int GetDigitSum13(int k)
+{
+    IEnumerable<int> Iterate(int k)
+    {
+        do
+        {
+            yield return k % sys;
+
+            k /= sys;
+        } while (k > 0);
+    }
+
+    return Iterate(k).Sum();
+}
 
 int[][] GetTerms(int k, int length, int maxValue)
 {
@@ -108,20 +117,26 @@ int GetTermCount(int k, int termCount, int digitCount)
     return GetPathes().Count();
 }
 
+
 //var t = GetTerms(2, 6, 13);
 //var c = GetTermCount(2, 6, 13);
 
 // 7-е число. Первый мультипликатор
 var m1 = sys;
 
+var termCountCache = new ConcurrentDictionary<int, long>();
+
 // какое число красивых чисел соответствует всем шестизначным числам 
-var m2 = Enumerable.Range(0, n).AsParallel().Select(k => GetTermCount(k, nn, sys)).Sum();
+var m2 = Enumerable.Range(0, n)
+    .Select(GetDigitSum13)
+    .AsParallel()
+    .Select(digitSum => termCountCache.GetOrAdd(digitSum, termCount => GetTermCount(termCount, nn, sys)))
+    .Sum();
 
 var res = m1 * m2;
 
-Debug.WriteLine($"Ответ: {GetPadNValue13(res, sys)} ({res})");
-
-Console.WriteLine(GetPadNValue13(res, sys));
+Debug.WriteLine($"Ответ: {GetValue13(res)} ({res})");
+Console.WriteLine(GetValue13(res));
 
 
 
