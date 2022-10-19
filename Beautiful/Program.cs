@@ -23,8 +23,12 @@ using System.Diagnostics;
 
 const string alphabet = "0123456789ABC";
 
+var sys = 13; 
 var nn = 6;
-var n = 13 * 13 * 13 * 13 * 13 * 13;
+
+// try 11, 5
+
+var n = Enumerable.Range(0, nn).Aggregate(1, (b, _) => sys * b);
 
 string GetValue13(int k)
 {
@@ -32,9 +36,9 @@ string GetValue13(int k)
     {
         do
         {
-            yield return alphabet[k % 13];
+            yield return alphabet[k % sys];
 
-            k /= 13;
+            k /= sys;
         } while (k > 0);
     }
 
@@ -108,34 +112,16 @@ int GetTermCount(int k, int termCount, int digitCount)
 //var c = GetTermCount(2, 6, 13);
 
 // 7-е число. Первый мультипликатор
-var m1 = 13;
-
-// какое число красивых чисел соответствует одному шестизначному числу
-//int CountBeauty(string k)
-//{
-//    var chars = k.ToArray();
-
-//    var counter = 0;
-//    for (var i = 0; i < nn; i++)
-//    for (var j = i + 1; j < nn; j++)
-//    {
-//        if (chars[i] != chars[j])
-//        {
-//            counter++;
-//        }
-//    }
-
-//    return counter;
-//}
+var m1 = sys;
 
 // какое число красивых чисел соответствует всем шестизначным числам 
-var m2 = Enumerable.Range(0, n).AsParallel().Select(k => GetTermCount(k, nn, 13)).Sum();
+var m2 = Enumerable.Range(0, n).AsParallel().Select(k => GetTermCount(k, nn, sys)).Sum();
 
 var res = m1 * m2;
 
-Debug.WriteLine($"Ответ: {res}");
+Debug.WriteLine($"Ответ: {GetPadNValue13(res, sys)} ({res})");
 
-Console.WriteLine(GetPadNValue13(res, 13));
+Console.WriteLine(GetPadNValue13(res, sys));
 
 
 
