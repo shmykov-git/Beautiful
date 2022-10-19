@@ -92,7 +92,7 @@ int GetTermCount(int k, int termCount, int digitCount)
     var count = 0;
     var sum = 0;
 
-    IEnumerable<int> GetPathes()
+    IEnumerable<bool> GetCounts()
     {
         if ((termCount - count) * digitCount < k - sum)
             yield break;
@@ -103,10 +103,10 @@ int GetTermCount(int k, int termCount, int digitCount)
             count++;
 
             if (sum == k && count == termCount)
-                yield return count;
+                yield return true;
 
             if (sum <= k && count < termCount)
-                foreach (var goodPath in GetPathes())
+                foreach (var goodPath in GetCounts())
                     yield return goodPath;
 
             sum -= i;
@@ -114,7 +114,7 @@ int GetTermCount(int k, int termCount, int digitCount)
         }
     }
 
-    return GetPathes().Count();
+    return GetCounts().Count();
 }
 
 
