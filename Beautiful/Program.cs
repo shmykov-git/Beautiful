@@ -19,6 +19,10 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Beautiful;
+
+//ForEacher1.ForEach1();
+//return;
 
 const string alphabet = "0123456789ABC";
 
